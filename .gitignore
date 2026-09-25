@@ -41,3 +41,9 @@ example
 # generated native folders
 /ios
 /android
+
+#misc
+/design-assets/
+/design.md
+app-blueprint.md
+todo.txt
