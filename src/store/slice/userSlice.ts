@@ -4,12 +4,13 @@ import {
   createNewUser,
   CreateUserInput,
   deleteUserById,
-  getUserById,
   getLocalUser,
+  getUserById,
   updateUserById,
   USER_CHANGES,
   USER_SELECT,
 } from '@/db/users';
+import { randomUser } from '@/utils/utils';
 import type { RootState } from '../store';
 
 type UserRow = NonNullable<Awaited<ReturnType<typeof getUserById>>>;
@@ -43,6 +44,17 @@ export const addNewUser = createAsyncThunk('user/new', async (user: CreateUserIn
   if (!addedUser) throw new Error('Unable to add new user.');
 
   return addedUser;
+});
+
+// loading local user and if no user then creating one
+export const loadOrCreateUser = createAsyncThunk('user/loadOrCreate', async () => {
+  const existingUser = await getLocalUser();
+  if (existingUser) return existingUser;
+
+  const newUser = await createNewUser(randomUser());
+  if (!newUser) throw new Error('Unable to create default user.');
+
+  return newUser;
 });
 
 // updates
@@ -95,6 +107,7 @@ const userSlice = createSlice({
         isAnyOf(
           loadUser.pending,
           loadLocalUser.pending,
+          loadOrCreateUser.pending,
           addNewUser.pending,
           updateUser.pending,
           deleteUser.pending
@@ -108,6 +121,7 @@ const userSlice = createSlice({
         isAnyOf(
           loadUser.fulfilled,
           loadLocalUser.fulfilled,
+          loadOrCreateUser.fulfilled,
           addNewUser.fulfilled,
           updateUser.fulfilled
         ),
@@ -120,6 +134,7 @@ const userSlice = createSlice({
         isAnyOf(
           loadUser.rejected,
           loadLocalUser.rejected,
+          loadOrCreateUser.rejected,
           addNewUser.rejected,
           updateUser.rejected,
           deleteUser.rejected
