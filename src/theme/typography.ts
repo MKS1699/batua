@@ -2,6 +2,9 @@ export const fonts = {
   regular: 'JetBrainsMono-Regular',
   medium: 'JetBrainsMono-Medium',
   bold: 'JetBrainsMono-Bold',
+  italic: 'JetBrainsMono-Italic',
+  mediumItalic: 'JetBrainsMono-MediumItalic',
+  boldItalic: 'JetBrainsMono-BoldItalic',
 } as const;
 
 export const typography = {
@@ -37,6 +40,30 @@ export const typography = {
 
   metadata: {
     fontFamily: fonts.regular,
+    fontSize: 14,
+    fontWeight: '400',
+  },
+
+  bodyItalic: {
+    fontFamily: fonts.italic,
+    fontSize: 16,
+    fontWeight: '400',
+  },
+
+  bodyMediumItalic: {
+    fontFamily: fonts.mediumItalic,
+    fontSize: 16,
+    fontWeight: '500',
+  },
+
+  bodyBoldItalic: {
+    fontFamily: fonts.boldItalic,
+    fontSize: 16,
+    fontWeight: '700',
+  },
+
+  metadataItalic: {
+    fontFamily: fonts.italic,
     fontSize: 14,
     fontWeight: '400',
   },
