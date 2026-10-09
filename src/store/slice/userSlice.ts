@@ -59,7 +59,7 @@ export const loadOrCreateUser = createAsyncThunk('user/loadOrCreate', async () =
 
 // updates
 // updating user
-type UPDATE_USER_INPUT = {
+export type UPDATE_USER_INPUT = {
   id: USER_SELECT['id'];
   updates: USER_CHANGES;
 };
