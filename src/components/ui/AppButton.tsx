@@ -1,5 +1,13 @@
 import { colors } from '@/theme';
-import { Pressable, StyleSheet, type PressableProps, type ViewStyle } from 'react-native';
+import React from 'react';
+import {
+  Pressable,
+  StyleSheet,
+  View,
+  type PressableProps,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
 import AppText from './AppText';
 
 type ButtonVariant = 'primary' | 'dark' | 'secondary';
@@ -7,13 +15,17 @@ type ButtonVariant = 'primary' | 'dark' | 'secondary';
 interface AppButtonProps extends Omit<PressableProps, 'children'> {
   label: string;
   variant?: ButtonVariant;
-  style?: ViewStyle;
+  icon?: React.ReactNode;
+  iconPosition?: 'left' | 'right';
+  style?: StyleProp<ViewStyle>;
 }
 
 export default function AppButton({
   label,
   variant = 'primary',
   disabled = false,
+  icon,
+  iconPosition = 'left',
   style,
   ...props
 }: AppButtonProps) {
@@ -24,6 +36,12 @@ export default function AppButton({
   }[variant];
 
   const textColor = variant === 'dark' ? colors.surface : colors.textPrimary;
+
+  const iconElement = icon
+    ? React.cloneElement(icon as React.ReactElement<{ color?: string }>, {
+        color: disabled ? colors.textSecondary : textColor,
+      })
+    : null;
 
   return (
     <Pressable
@@ -40,15 +58,21 @@ export default function AppButton({
         style,
       ]}
     >
-      <AppText
-        variant="bodyImportant"
-        style={{
-          color: disabled ? colors.textSecondary : textColor,
-          textAlign: 'center',
-        }}
-      >
-        {label}
-      </AppText>
+      <View style={styles.content}>
+        {iconPosition === 'left' && iconElement}
+
+        <AppText
+          variant="bodyImportant"
+          style={{
+            color: disabled ? colors.textSecondary : textColor,
+            textAlign: 'center',
+          }}
+        >
+          {label}
+        </AppText>
+
+        {iconPosition === 'right' && iconElement}
+      </View>
     </Pressable>
   );
 }
@@ -62,5 +86,11 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  content: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
   },
 });
