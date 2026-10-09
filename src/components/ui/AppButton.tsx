@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import AppText from './AppText';
 
-type ButtonVariant = 'primary' | 'dark' | 'secondary';
+type ButtonVariant = 'primary' | 'dark' | 'secondary' | 'danger';
 
 interface AppButtonProps extends Omit<PressableProps, 'children'> {
   label: string;
@@ -33,6 +33,7 @@ export default function AppButton({
     primary: colors.actionPrimary,
     dark: colors.textPrimary,
     secondary: colors.surface,
+    danger: colors.statusError,
   }[variant];
 
   const textColor = variant === 'dark' ? colors.surface : colors.textPrimary;
