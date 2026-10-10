@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "budget-planner",
-    "slug": "budget-planner",
+    "name": "batua",
+    "slug": "batua",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "budgetplanner",
+    "scheme": "batua",
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon"
