@@ -26,14 +26,6 @@ export enum UserBudgetRole {
   viewer = 'viewer',
 }
 
-export enum BudgetPeriod {
-  daily = 'daily',
-  weekly = 'weekly',
-  monthly = 'monthly',
-  yearly = 'yearly',
-  custom = 'custom',
-}
-
 interface BudgetMembership {
   id: string;
   budgetId: Budget['id'];
@@ -72,11 +64,11 @@ interface Budget {
   name: string;
   description: string;
   ownerId: User['id'];
-  period: BudgetPeriod;
   startDate: string;
-  endDate: string;
+  endDate: string | null;
   currency: Currency;
   isShareable: boolean;
   createdAt: string;
   updatedAt: string;
+  limitAmount: number | null;
 }

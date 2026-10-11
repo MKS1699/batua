@@ -1,7 +1,7 @@
 {
   "version": "7",
   "dialect": "sqlite",
-  "id": "fac9f766-cb98-40fd-8e32-9ee7d044b67b",
+  "id": "cba66e06-2ff7-485e-be1d-7c125a39c360",
   "prevIds": [
     "00000000-0000-0000-0000-000000000000"
   ],
@@ -128,23 +128,13 @@
       "autoincrement": false,
       "default": null,
       "generated": null,
-      "name": "period",
-      "entityType": "columns",
-      "table": "budgets"
-    },
-    {
-      "type": "text",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
       "name": "start_date",
       "entityType": "columns",
       "table": "budgets"
     },
     {
       "type": "text",
-      "notNull": true,
+      "notNull": false,
       "autoincrement": false,
       "default": null,
       "generated": null,
@@ -159,6 +149,16 @@
       "default": "'INR'",
       "generated": null,
       "name": "currency",
+      "entityType": "columns",
+      "table": "budgets"
+    },
+    {
+      "type": "real",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "limit_amount",
       "entityType": "columns",
       "table": "budgets"
     },

@@ -1,10 +1,4 @@
-import {
-  BudgetPeriod,
-  Currency,
-  PaymentMethod,
-  TransactionType,
-  UserBudgetRole,
-} from '@/types/dataTypes';
+import { Currency, PaymentMethod, TransactionType, UserBudgetRole } from '@/types/dataTypes';
 import { integer, real, sqliteTable, text, unique } from 'drizzle-orm/sqlite-core';
 
 export const usersTable = sqliteTable('users', {
@@ -23,10 +17,10 @@ export const budgetsTable = sqliteTable('budgets', {
   ownerId: text('owner_id')
     .references(() => usersTable.id)
     .notNull(),
-  period: text('period').$type<BudgetPeriod>().notNull(),
   startDate: text('start_date').notNull(),
-  endDate: text('end_date').notNull(),
+  endDate: text('end_date'),
   currency: text('currency').$type<Currency>().notNull().default(Currency.INR),
+  limitAmount: real('limit_amount'),
   isShareable: integer('is_shareable', { mode: 'boolean' }).notNull().default(false),
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),

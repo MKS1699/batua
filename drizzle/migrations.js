@@ -1,10 +1,10 @@
 // This file is required for Expo/React Native SQLite migrations - https://orm.drizzle.team/quick-sqlite/expo
 
-import m0000 from './20260925162834_open_kronos/migration.sql';
+import m0000 from './20261011144949_init/migration.sql';
 
   export default {
     migrations: {
-      "20260925162834_open_kronos": m0000
+      "20261011144949_init": m0000
 }
   }
   
