@@ -1,11 +1,16 @@
 // AppBootstrap.tsx
+import { ensureUserBootstrapData } from '@/db/bootstrap';
 import { db } from '@/db/client';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { loadBudgetMembershipsByUserId } from '@/store/slice/budgetMembershipSlice';
+import { loadBudgetsByOwnerId } from '@/store/slice/budgetSlice';
+import { loadTransactionsByBudgetId } from '@/store/slice/transactionSlice';
+import { loadUserPreference } from '@/store/slice/userPreferenceSlice';
 import { getUserState, loadOrCreateUser } from '@/store/slice/userSlice';
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useRef, useState } from 'react';
 import { Text, View } from 'react-native';
-import migrations from '../../drizzle/migrations'; // path to your migrations.js
+import migrations from '../../drizzle/migrations';
 
 type AppBootstrapProps = {
   children: ReactNode;
@@ -16,25 +21,47 @@ const AppBootstrap = ({ children }: AppBootstrapProps) => {
 
   const dispatch = useAppDispatch();
   const { status: userStatus, currentUser } = useAppSelector(getUserState);
-  const [isReady, setIsReady] = useState<boolean>(false);
+
+  const [isReady, setIsReady] = useState(false);
+  const [bootstrapError, setBootstrapError] = useState<string | null>(null);
+  const initializationStarted = useRef(false);
 
   useEffect(() => {
-    if (!migrationsReady) return; // wait for migrations before touching the DB
+    if (!migrationsReady || initializationStarted.current) {
+      return;
+    }
+
+    initializationStarted.current = true;
 
     async function initialize() {
-      const result = await dispatch(loadOrCreateUser());
+      try {
+        // 1. Load or create the local user.
+        const user = await dispatch(loadOrCreateUser()).unwrap();
 
-      if (loadOrCreateUser.fulfilled.match(result)) {
+        // 2. Ensure the initial budget, membership, and preference.
+        const { defaultBudgetId } = await ensureUserBootstrapData(user.id);
+
+        // 3. Hydrate the existing Redux slices.
+        await Promise.all([
+          dispatch(loadBudgetsByOwnerId(user.id)).unwrap(),
+          dispatch(loadBudgetMembershipsByUserId(user.id)).unwrap(),
+          dispatch(loadUserPreference(user.id)).unwrap(),
+          dispatch(loadTransactionsByBudgetId(defaultBudgetId)).unwrap(),
+        ]);
+
         setIsReady(true);
+      } catch (error) {
+        setBootstrapError(error instanceof Error ? error.message : 'Unable to initialize Batua.');
       }
     }
-    initialize();
+
+    void initialize();
   }, [dispatch, migrationsReady]);
 
-  if (migrationError) {
+  if (bootstrapError) {
     return (
       <View>
-        <Text>Migration error: {migrationError.message}</Text>
+        <Text>Unable to initialize Batua: {bootstrapError}</Text>
       </View>
     );
   }
