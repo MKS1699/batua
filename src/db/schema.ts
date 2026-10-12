@@ -67,3 +67,13 @@ export const transactionsTable = sqliteTable('transactions', {
     .references(() => usersTable.id)
     .notNull(),
 });
+
+export const userPreferencesTable = sqliteTable('user_preferences', {
+  userId: text('user_id')
+    .primaryKey()
+    .references(() => usersTable.id, { onDelete: 'cascade' })
+    .notNull(),
+  defaultBudgetId: text('default_budget_id')
+    .references(() => budgetsTable.id)
+    .notNull(),
+});

@@ -28,11 +28,7 @@ export async function createNewBudget(input: CreateBudgetInput) {
 
 // read
 export async function getBudgetById(id: BUDGET_SELECT['id']) {
-  const rows = await db
-    .select()
-    .from(budgetsTable)
-    .where(eq(budgetsTable.id, id))
-    .limit(1);
+  const rows = await db.select().from(budgetsTable).where(eq(budgetsTable.id, id)).limit(1);
 
   return rows[0] ?? null;
 }
@@ -47,11 +43,11 @@ export type BUDGET_CHANGES = Partial<
     | 'name'
     | 'description'
     | 'ownerId'
-    | 'period'
     | 'startDate'
     | 'endDate'
     | 'currency'
     | 'isShareable'
+    | 'limitAmount'
   >
 >;
 

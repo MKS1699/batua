@@ -2,14 +2,14 @@ import { EditProfile, ScreenContainer, UserCard } from '@/components';
 import { AppBottomSheet, AppButton } from '@/components/ui';
 import { useAppSelector } from '@/store/hooks';
 import { getUser } from '@/store/slice/userSlice';
-import BottomSheet from '@expo/ui/community/bottom-sheet';
+import { BottomSheetMethods } from '@expo/ui/community/bottom-sheet';
 import { PencilSimpleIcon } from 'phosphor-react-native';
 import { useEffect, useRef } from 'react';
 import { Keyboard, StyleSheet } from 'react-native';
 
 const User = () => {
   const user = useAppSelector(getUser);
-  const editProfileRef = useRef<BottomSheet>(null);
+  const editProfileRef = useRef<BottomSheetMethods | null>(null);
 
   useEffect(() => {
     const keyboardSubscription = Keyboard.addListener('keyboardDidShow', () => {

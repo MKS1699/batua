@@ -42,6 +42,13 @@ CREATE TABLE `transactions` (
 	CONSTRAINT `fk_transactions_created_by_users_id_fk` FOREIGN KEY (`created_by`) REFERENCES `users`(`id`)
 );
 --> statement-breakpoint
+CREATE TABLE `user_preferences` (
+	`user_id` text PRIMARY KEY,
+	`default_budget_id` text NOT NULL,
+	CONSTRAINT `fk_user_preferences_user_id_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+	CONSTRAINT `fk_user_preferences_default_budget_id_budgets_id_fk` FOREIGN KEY (`default_budget_id`) REFERENCES `budgets`(`id`)
+);
+--> statement-breakpoint
 CREATE TABLE `users` (
 	`id` text PRIMARY KEY,
 	`name` text NOT NULL,

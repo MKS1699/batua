@@ -72,3 +72,8 @@ interface Budget {
   updatedAt: string;
   limitAmount: number | null;
 }
+
+interface UserPreference {
+  userId: User['id'];
+  defaultBudgetId: Budget['id'];
+}

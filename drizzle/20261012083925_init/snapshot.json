@@ -1,7 +1,7 @@
 {
   "version": "7",
   "dialect": "sqlite",
-  "id": "cba66e06-2ff7-485e-be1d-7c125a39c360",
+  "id": "50ebae92-5a3a-4e21-be3d-725879504fa1",
   "prevIds": [
     "00000000-0000-0000-0000-000000000000"
   ],
@@ -16,6 +16,10 @@
     },
     {
       "name": "transactions",
+      "entityType": "tables"
+    },
+    {
+      "name": "user_preferences",
       "entityType": "tables"
     },
     {
@@ -318,6 +322,26 @@
       "autoincrement": false,
       "default": null,
       "generated": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "table": "user_preferences"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "default_budget_id",
+      "entityType": "columns",
+      "table": "user_preferences"
+    },
+    {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
       "name": "id",
       "entityType": "columns",
       "table": "users"
@@ -449,6 +473,36 @@
     },
     {
       "columns": [
+        "user_id"
+      ],
+      "tableTo": "users",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "nameExplicit": false,
+      "name": "fk_user_preferences_user_id_users_id_fk",
+      "entityType": "fks",
+      "table": "user_preferences"
+    },
+    {
+      "columns": [
+        "default_budget_id"
+      ],
+      "tableTo": "budgets",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "nameExplicit": false,
+      "name": "fk_user_preferences_default_budget_id_budgets_id_fk",
+      "entityType": "fks",
+      "table": "user_preferences"
+    },
+    {
+      "columns": [
         "id"
       ],
       "nameExplicit": false,
@@ -472,6 +526,15 @@
       "nameExplicit": false,
       "name": "transactions_pk",
       "table": "transactions",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "user_id"
+      ],
+      "nameExplicit": false,
+      "name": "user_preferences_pk",
+      "table": "user_preferences",
       "entityType": "pks"
     },
     {

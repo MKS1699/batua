@@ -12,7 +12,7 @@ type AppBootstrapProps = {
 };
 
 const AppBootstrap = ({ children }: AppBootstrapProps) => {
-  const { success: migrationsReady, error: migrationError } = useMigrations(db, migrations);
+  const { success: migrationsReady, error: migrationError } = useMigrations(db, migrations as any);
 
   const dispatch = useAppDispatch();
   const { status: userStatus, currentUser } = useAppSelector(getUserState);
