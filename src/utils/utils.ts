@@ -29,3 +29,12 @@ export const moneyFormatter = (currency: Currency, value: string): string => {
     .join('')
     .trim();
 };
+
+export function objectLogger(title: string, object: unknown) {
+  if (object !== null && typeof object === 'object') {
+    console.log(`${title}:`, JSON.stringify(object, null, 2));
+    return;
+  }
+
+  console.log(`${title}:`, object);
+}
