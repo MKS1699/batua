@@ -1,15 +1,16 @@
 import { createAsyncThunk, createSlice, isAnyOf, type PayloadAction } from '@reduxjs/toolkit';
 
 import {
-  createNewBudget,
+  BUDGET_CHANGES,
+  BUDGET_SELECT,
   CreateBudgetInput,
+  createNewBudget,
   deleteBudgetById,
   getBudgetById,
   getBudgetsByOwnerId,
   updateBudgetById,
-  BUDGET_CHANGES,
-  BUDGET_SELECT,
 } from '@/db/budgets';
+import { getTransactionTotalsByBudgetId, type BudgetTransactionTotals } from '@/db/transactions';
 import type { RootState } from '../store';
 
 type BudgetRow = NonNullable<Awaited<ReturnType<typeof getBudgetById>>>;
@@ -19,9 +20,17 @@ type BudgetListFilter = {
   value: string;
 };
 
+export type BudgetSummary = {
+  budgetId: BUDGET_SELECT['id'];
+  totals: BudgetTransactionTotals[];
+};
+
+export type BudgetSummaries = BudgetSummary[];
+
 interface BudgetState {
   currentBudget: BudgetRow | null;
   budgets: BudgetRow[];
+  budgetSummaries: BudgetSummaries;
   // The list represents the most recently requested owner, budget, or user.
   listFilter: BudgetListFilter | null;
   listRequestId: string | null;
@@ -33,6 +42,7 @@ interface BudgetState {
 const initialState: BudgetState = {
   currentBudget: null,
   budgets: [],
+  budgetSummaries: [],
   listFilter: null,
   listRequestId: null,
   detailRequestId: null,
@@ -41,12 +51,9 @@ const initialState: BudgetState = {
 };
 
 // loading an existing budget by ID
-export const loadBudget = createAsyncThunk(
-  'budget/load',
-  async (id: BUDGET_SELECT['id']) => {
-    return await getBudgetById(id);
-  }
-);
+export const loadBudget = createAsyncThunk('budget/load', async (id: BUDGET_SELECT['id']) => {
+  return await getBudgetById(id);
+});
 
 // loading lists
 export const loadBudgetsByOwnerId = createAsyncThunk(
@@ -57,16 +64,13 @@ export const loadBudgetsByOwnerId = createAsyncThunk(
 );
 
 // adding a new budget
-export const addNewBudget = createAsyncThunk(
-  'budget/new',
-  async (input: CreateBudgetInput) => {
-    const addedBudget = await createNewBudget(input);
+export const addNewBudget = createAsyncThunk('budget/new', async (input: CreateBudgetInput) => {
+  const addedBudget = await createNewBudget(input);
 
-    if (!addedBudget) throw new Error('Unable to add new budget.');
+  if (!addedBudget) throw new Error('Unable to add new budget.');
 
-    return addedBudget;
-  }
-);
+  return addedBudget;
+});
 
 // updates
 type UPDATE_BUDGET_INPUT = {
@@ -86,14 +90,24 @@ export const updateBudget = createAsyncThunk(
 );
 
 // delete
-export const deleteBudget = createAsyncThunk(
-  'budget/delete',
-  async (id: BUDGET_SELECT['id']) => {
-    const deletedBudgetId = await deleteBudgetById(id);
+export const deleteBudget = createAsyncThunk('budget/delete', async (id: BUDGET_SELECT['id']) => {
+  const deletedBudgetId = await deleteBudgetById(id);
 
-    if (deletedBudgetId === null) throw new Error(`Unable to delete budget: ${id}.`);
+  if (deletedBudgetId === null) throw new Error(`Unable to delete budget: ${id}.`);
 
-    return deletedBudgetId;
+  return deletedBudgetId;
+});
+
+// get budget summary by budgetId
+export const fetchBudgetSummary = createAsyncThunk(
+  'budget/fetchBudgetSummary',
+  async (budgetId: string) => {
+    const totals = await getTransactionTotalsByBudgetId(budgetId);
+
+    return {
+      budgetId,
+      totals,
+    };
   }
 );
 
@@ -150,28 +164,35 @@ const budgetSlice = createSlice({
         state.status = 'succeeded';
         state.error = null;
       })
-      .addMatcher(
-        isAnyOf(loadBudgetsByOwnerId.fulfilled),
-        (state, action) => {
-          // An older request must not replace a newer filter's results.
-          if (state.listRequestId !== action.meta.requestId) return;
+      .addCase(fetchBudgetSummary.fulfilled, (state, action) => {
+        const summary = action.payload;
 
-          state.budgets = action.payload;
-          state.listRequestId = null;
-          state.status = 'succeeded';
-          state.error = null;
-        }
-      )
-      .addMatcher(
-        isAnyOf(loadBudgetsByOwnerId.rejected),
-        (state, action) => {
-          if (state.listRequestId !== action.meta.requestId) return;
+        const existingIndex = state.budgetSummaries.findIndex(
+          (item) => item.budgetId === summary.budgetId
+        );
 
-          state.listRequestId = null;
-          state.status = 'failed';
-          state.error = action.error.message ?? 'Database operation failed.';
+        if (existingIndex !== -1) {
+          state.budgetSummaries[existingIndex] = summary;
+        } else {
+          state.budgetSummaries.push(summary);
         }
-      )
+      })
+      .addMatcher(isAnyOf(loadBudgetsByOwnerId.fulfilled), (state, action) => {
+        // An older request must not replace a newer filter's results.
+        if (state.listRequestId !== action.meta.requestId) return;
+
+        state.budgets = action.payload;
+        state.listRequestId = null;
+        state.status = 'succeeded';
+        state.error = null;
+      })
+      .addMatcher(isAnyOf(loadBudgetsByOwnerId.rejected), (state, action) => {
+        if (state.listRequestId !== action.meta.requestId) return;
+
+        state.listRequestId = null;
+        state.status = 'failed';
+        state.error = action.error.message ?? 'Database operation failed.';
+      })
       .addMatcher(
         isAnyOf(addNewBudget.pending, updateBudget.pending, deleteBudget.pending),
         (state) => {
@@ -179,26 +200,23 @@ const budgetSlice = createSlice({
           state.error = null;
         }
       )
-      .addMatcher(
-        isAnyOf(addNewBudget.fulfilled, updateBudget.fulfilled),
-        (state, action) => {
-          const row = action.payload;
-          state.currentBudget = row;
-          state.detailRequestId = null;
-          const index = state.budgets.findIndex((item) => item.id === row.id);
-          const matchesFilter =
-            !state.listFilter || row[state.listFilter.field] === state.listFilter.value;
+      .addMatcher(isAnyOf(addNewBudget.fulfilled, updateBudget.fulfilled), (state, action) => {
+        const row = action.payload;
+        state.currentBudget = row;
+        state.detailRequestId = null;
+        const index = state.budgets.findIndex((item) => item.id === row.id);
+        const matchesFilter =
+          !state.listFilter || row[state.listFilter.field] === state.listFilter.value;
 
-          if (matchesFilter) {
-            if (index === -1) state.budgets.push(row);
-            else state.budgets[index] = row;
-          } else if (index !== -1) {
-            state.budgets.splice(index, 1);
-          }
-          state.status = 'succeeded';
-          state.error = null;
+        if (matchesFilter) {
+          if (index === -1) state.budgets.push(row);
+          else state.budgets[index] = row;
+        } else if (index !== -1) {
+          state.budgets.splice(index, 1);
         }
-      )
+        state.status = 'succeeded';
+        state.error = null;
+      })
       .addMatcher(
         isAnyOf(addNewBudget.rejected, updateBudget.rejected, deleteBudget.rejected),
         (state, action) => {
@@ -217,3 +235,6 @@ export const { resetBudgetSliceState, setCurrentBudget } = budgetSlice.actions;
 export const getBudget = (state: RootState) => state.budgetReducer.currentBudget;
 export const getBudgets = (state: RootState) => state.budgetReducer.budgets;
 export const getBudgetState = (state: RootState) => state.budgetReducer;
+export const getBudgetSummaries = (state: RootState) => state.budgetReducer.budgetSummaries;
+export const getBudgetSummary = (state: RootState, budgetId: BUDGET_SELECT['id']) =>
+  state.budgetReducer.budgetSummaries.find((summary) => summary.budgetId === budgetId);

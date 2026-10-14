@@ -3,7 +3,7 @@ import { ensureUserBootstrapData } from '@/db/bootstrap';
 import { db } from '@/db/client';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { loadBudgetMembershipsByUserId } from '@/store/slice/budgetMembershipSlice';
-import { loadBudgetsByOwnerId } from '@/store/slice/budgetSlice';
+import { fetchBudgetSummary, loadBudgetsByOwnerId } from '@/store/slice/budgetSlice';
 import { loadTransactionsByBudgetId } from '@/store/slice/transactionSlice';
 import { loadUserPreference } from '@/store/slice/userPreferenceSlice';
 import { getUserState, loadOrCreateUser } from '@/store/slice/userSlice';
@@ -42,8 +42,10 @@ const AppBootstrap = ({ children }: AppBootstrapProps) => {
         const { defaultBudgetId } = await ensureUserBootstrapData(user.id);
 
         // 3. Hydrate the existing Redux slices.
+        const budgets = await dispatch(loadBudgetsByOwnerId(user.id)).unwrap();
+
         await Promise.all([
-          dispatch(loadBudgetsByOwnerId(user.id)).unwrap(),
+          ...budgets.map((budget) => dispatch(fetchBudgetSummary(budget.id)).unwrap()),
           dispatch(loadBudgetMembershipsByUserId(user.id)).unwrap(),
           dispatch(loadUserPreference(user.id)).unwrap(),
           dispatch(loadTransactionsByBudgetId(defaultBudgetId)).unwrap(),

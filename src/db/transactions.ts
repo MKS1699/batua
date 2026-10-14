@@ -38,18 +38,12 @@ export async function getTransactionById(id: TRANSACTION_SELECT['id']) {
 }
 
 export async function getTransactionsByBudgetId(budgetId: TRANSACTION_SELECT['budgetId']) {
-  return await db
-    .select()
-    .from(transactionsTable)
-    .where(eq(transactionsTable.budgetId, budgetId));
+  return await db.select().from(transactionsTable).where(eq(transactionsTable.budgetId, budgetId));
 }
 
 // Transactions created by this user across all budgets.
 export async function getTransactionsByUserId(userId: TRANSACTION_SELECT['createdBy']) {
-  return await db
-    .select()
-    .from(transactionsTable)
-    .where(eq(transactionsTable.createdBy, userId));
+  return await db.select().from(transactionsTable).where(eq(transactionsTable.createdBy, userId));
 }
 
 export type TRANSACTION_CHANGES = Partial<
@@ -88,4 +82,46 @@ export async function deleteTransactionById(id: TRANSACTION_SELECT['id']) {
     .returning({ id: transactionsTable.id });
 
   return deletedTransaction?.id ?? null;
+}
+
+// get amounts of all the transactions of a budget grouped by transaction currencies
+export type BudgetTransactionTotals = {
+  currency: TRANSACTION_SELECT['originalCurrency'];
+  total: number;
+  income: number;
+  expense: number;
+};
+
+export async function getTransactionTotalsByBudgetId(
+  budgetId: TRANSACTION_SELECT['budgetId']
+): Promise<BudgetTransactionTotals[]> {
+  const transactions = await getTransactionsByBudgetId(budgetId);
+
+  const totals = new Map<BudgetTransactionTotals['currency'], BudgetTransactionTotals>();
+
+  for (const transaction of transactions) {
+    const currency = transaction.originalCurrency;
+
+    if (!totals.has(currency)) {
+      totals.set(currency, {
+        currency,
+        total: 0,
+        income: 0,
+        expense: 0,
+      });
+    }
+
+    const summary = totals.get(currency)!;
+    const amount = Number(transaction.amount);
+
+    if (transaction.transactionType === 'income') {
+      summary.income += amount;
+    } else if (transaction.transactionType === 'expense') {
+      summary.expense += amount;
+    }
+
+    summary.total = summary.income - summary.expense;
+  }
+
+  return Array.from(totals.values());
 }
