@@ -29,4 +29,12 @@ export const colors = {
   // Status
   statusSuccess: '#236C50',
   statusError: '#B42318',
+
+  // success shades
+  statusSuccessSoft: '#70B99A',
+  statusSuccessDark: '#194D39',
+
+  // error shades
+  statusErrorSoft: '#E7837A',
+  statusErrorDark: '#8F1D14',
 } as const;
