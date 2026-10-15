@@ -23,13 +23,11 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <StoreProvider>
         <AppBootstrap>
-          <Stack>
-            <Stack.Screen
-              name="(tabs)"
-              options={{
-                headerShown: false,
-              }}
-            />
+          <Stack screenOptions={{ headerShown: false }}>
+            {/* tabs screens */}
+            <Stack.Screen name="(tabs)" />
+            {/* transaction screens */}
+            <Stack.Screen name="transaction" />
           </Stack>
           <StatusBar />
         </AppBootstrap>

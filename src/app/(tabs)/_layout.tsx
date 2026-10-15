@@ -1,3 +1,4 @@
+import { colors } from '@/theme';
 import { Tabs } from 'expo-router';
 import { ChartLineIcon, HouseIcon, UserIcon, WalletIcon } from 'phosphor-react-native';
 import { Pressable } from 'react-native';
@@ -8,10 +9,12 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
-        tabBarActiveTintColor: '#236C50',
+        tabBarActiveTintColor: colors.accentTeal,
         tabBarStyle: {
           paddingTop: 10,
           backgroundColor: '#fff',
+          borderTopWidth: 2,
+          borderTopColor: colors.borderStrong,
         },
         tabBarButton: ({ ref, ...props }) => (
           <Pressable
