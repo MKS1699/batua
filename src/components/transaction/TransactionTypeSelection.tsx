@@ -78,12 +78,12 @@ const styles = StyleSheet.create({
   },
   selectedExpense: {
     borderRightWidth: 2,
-    backgroundColor: colors.statusErrorSoft,
+    backgroundColor: colors.statusErrorLight,
     borderColor: colors.statusErrorDark,
   },
   selectedIncome: {
     borderLeftWidth: 2,
-    backgroundColor: colors.statusSuccessSoft,
+    backgroundColor: colors.statusSuccessLight,
     borderColor: colors.statusSuccessDark,
   },
   unSelectedExpense: {
