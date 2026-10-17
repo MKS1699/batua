@@ -38,3 +38,35 @@ export function objectLogger(title: string, object: unknown) {
 
   console.log(`${title}:`, object);
 }
+
+export enum GenericDates {
+  today = 'Today',
+  yesterday = 'Yesterday',
+  undefined = 'Undefined Date',
+}
+
+export function getGenericDate(currDate: Date): GenericDates {
+  if (Number.isNaN(currDate.getTime())) {
+    return GenericDates.undefined;
+  }
+
+  const today = new Date();
+  const yesterday = new Date();
+
+  today.setHours(0, 0, 0, 0);
+  yesterday.setDate(yesterday.getDate() - 1);
+  yesterday.setHours(0, 0, 0, 0);
+
+  const current = new Date(currDate);
+  current.setHours(0, 0, 0, 0);
+
+  if (current.getTime() === today.getTime()) {
+    return GenericDates.today;
+  }
+
+  if (current.getTime() === yesterday.getTime()) {
+    return GenericDates.yesterday;
+  }
+
+  return GenericDates.undefined;
+}
