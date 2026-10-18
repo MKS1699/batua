@@ -1,8 +1,13 @@
 import {
   CurrencyDollarIcon,
+  CurrencyEurIcon,
   CurrencyGbpIcon,
   CurrencyInrIcon,
   CurrencyJpyIcon,
+  CurrencyKrwIcon,
+  CurrencyKztIcon,
+  CurrencyNgnIcon,
+  CurrencyRubIcon,
   MoneyWavyIcon,
 } from 'phosphor-react-native';
 
@@ -28,14 +33,24 @@ const AppCurrencyIcon = ({
   const props = { size, ...(resolvedColor ? { color: resolvedColor } : {}) };
 
   switch (currency) {
-    case Currency.INR:
+    case 'INR':
       return <CurrencyInrIcon {...props} />;
-    case Currency.GBP:
+    case 'GBP':
       return <CurrencyGbpIcon {...props} />;
-    case Currency.JPY:
+    case 'JPY':
       return <CurrencyJpyIcon {...props} />;
-    case Currency.USD:
+    case 'USD':
       return <CurrencyDollarIcon {...props} />;
+    case 'EUR':
+      return <CurrencyEurIcon {...props} />;
+    case 'KRW':
+      return <CurrencyKrwIcon {...props} />;
+    case 'KZT':
+      return <CurrencyKztIcon {...props} />;
+    case 'NGN':
+      return <CurrencyNgnIcon {...props} />;
+    case 'RUB':
+      return <CurrencyRubIcon {...props} />;
     default:
       return <MoneyWavyIcon {...props} />;
   }
