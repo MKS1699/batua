@@ -19,7 +19,7 @@ export const budgetsTable = sqliteTable('budgets', {
     .notNull(),
   startDate: text('start_date').notNull(),
   endDate: text('end_date'),
-  currency: text('currency').$type<Currency>().notNull().default(Currency.INR),
+  currency: text('currency').$type<Currency>().notNull().default('INR'),
   limitAmount: real('limit_amount'),
   isShareable: integer('is_shareable', { mode: 'boolean' }).notNull().default(false),
   createdAt: text('created_at').notNull(),
@@ -51,7 +51,7 @@ export const transactionsTable = sqliteTable('transactions', {
   amount: real('amount').notNull(),
   title: text('title').notNull(),
   description: text('description').notNull(),
-  originalCurrency: text('original_currency').$type<Currency>().notNull().default(Currency.INR),
+  originalCurrency: text('original_currency').$type<Currency>().notNull().default('INR'),
   transactionType: text('transaction_type')
     .$type<TransactionType>()
     .notNull()

@@ -1,9 +1,13 @@
-export enum Currency {
-  INR = 'INR',
-  USD = 'USD',
-  GBP = 'GBP',
-  JPY = 'JPY',
-}
+import CurrencyData from '@/data/currencies.json';
+import CurrencyCountries from '@/data/current_currencies_country.json';
+
+export { CurrencyCountries, CurrencyData };
+
+export type Currency = keyof typeof CurrencyData;
+export type CurrencyOption = (typeof CurrencyData)[Currency];
+export const CurrencyCodes = Object.keys(CurrencyData) as Currency[];
+export const CurrencyList = Object.values(CurrencyData);
+export const CurrencyCountryList = Object.values(CurrencyCountries);
 
 export enum TransactionType {
   income = 'income',
