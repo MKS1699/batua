@@ -67,4 +67,16 @@ export const typography = {
     fontSize: 14,
     fontWeight: '400',
   },
+
+  metadataMediumItalic: {
+    fontFamily: fonts.mediumItalic,
+    fontSize: 14,
+    fontWeight: '500',
+  },
+
+  metadataBoldItalic: {
+    fontFamily: fonts.boldItalic,
+    fontSize: 14,
+    fontWeight: '700',
+  },
 } as const;
