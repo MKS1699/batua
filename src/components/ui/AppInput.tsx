@@ -1,27 +1,65 @@
 import { colors, fonts } from '@/theme';
+import type { ReactNode } from 'react';
 import { StyleSheet, TextInput, View, type TextInputProps, type ViewStyle } from 'react-native';
 import AppText from './AppText';
+
+type InputIconPosition = 'start' | 'end' | 'beforeLabel' | 'afterLabel';
 
 interface AppInputProps extends TextInputProps {
   label: string;
   error?: string;
   containerStyle?: ViewStyle;
+  icon?: ReactNode;
+  iconPosition?: InputIconPosition;
 }
 
-export default function AppInput({ label, error, containerStyle, style, ...props }: AppInputProps) {
+export default function AppInput({
+  label,
+  error,
+  containerStyle,
+  style,
+  icon,
+  iconPosition = 'start',
+  ...props
+}: AppInputProps) {
+  const isLabelIcon = iconPosition === 'beforeLabel' || iconPosition === 'afterLabel';
+
   return (
     <View style={containerStyle}>
-      <AppText variant="bodyImportant" style={styles.label}>
-        {label}
-      </AppText>
+      {isLabelIcon ? (
+        <View style={styles.labelRow}>
+          {iconPosition === 'beforeLabel' && icon}
 
-      <TextInput
-        {...props}
-        accessibilityLabel={label}
-        placeholderTextColor={colors.textSecondary}
-        selectionColor={colors.textPrimary}
-        style={[styles.input, error ? styles.inputError : undefined, style]}
-      />
+          <AppText variant="bodyImportant" style={styles.label}>
+            {label}
+          </AppText>
+
+          {iconPosition === 'afterLabel' && icon}
+        </View>
+      ) : (
+        <AppText variant="bodyImportant" style={styles.label}>
+          {label}
+        </AppText>
+      )}
+
+      <View style={[styles.inputContainer, error ? styles.inputError : undefined]}>
+        {iconPosition === 'start' && icon}
+
+        <TextInput
+          {...props}
+          accessibilityLabel={label || props.placeholder}
+          placeholderTextColor={colors.textSecondary}
+          selectionColor={colors.textPrimary}
+          style={[
+            styles.input,
+            iconPosition === 'start' && styles.inputWithStartIcon,
+            iconPosition === 'end' && styles.inputWithEndIcon,
+            style,
+          ]}
+        />
+
+        {iconPosition === 'end' && icon}
+      </View>
 
       {error ? (
         <AppText variant="metadata" accessibilityRole="alert" style={styles.error}>
@@ -36,17 +74,35 @@ const styles = StyleSheet.create({
   label: {
     marginBottom: 8,
   },
-  input: {
+  labelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+  },
+  inputContainer: {
     minHeight: 48,
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 12,
-    paddingVertical: 10,
-    color: colors.textPrimary,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.borderStrong,
     borderRadius: 6,
+  },
+  input: {
+    flex: 1,
+    minWidth: 0,
+    paddingVertical: 10,
+    color: colors.textPrimary,
     fontFamily: fonts.regular,
     fontSize: 16,
+  },
+  inputWithStartIcon: {
+    marginLeft: 8,
+  },
+  inputWithEndIcon: {
+    marginRight: 8,
   },
   inputError: {
     borderColor: colors.statusError,
