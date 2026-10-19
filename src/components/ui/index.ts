@@ -4,6 +4,7 @@ import AppCard from './AppCard';
 import AppCurrencyIcon from './AppCurrencyIcon';
 import AppDivider from './AppDivider';
 import AppInput from './AppInput';
+import AppPaymentMethodIcon from './AppPaymentMethodIcon';
 import AppText from './AppText';
 import ProgressBar from './ProgressBar';
 
@@ -14,6 +15,7 @@ export {
   AppCurrencyIcon,
   AppDivider,
   AppInput,
+  AppPaymentMethodIcon,
   AppText,
   ProgressBar,
 };

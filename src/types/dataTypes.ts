@@ -23,6 +23,15 @@ export enum PaymentMethod {
   other = 'other',
 }
 
+export const PaymentMethodDefined: Record<PaymentMethod, string> = {
+  [PaymentMethod.cash]: 'Cash',
+  [PaymentMethod.upi]: 'UPI',
+  [PaymentMethod.bankTransfer]: 'Bank Transfer',
+  [PaymentMethod.debitCard]: 'Debit Card',
+  [PaymentMethod.creditCard]: 'Credit Card',
+  [PaymentMethod.other]: 'Other',
+};
+
 export enum UserBudgetRole {
   owner = 'owner',
   admin = 'admin',
