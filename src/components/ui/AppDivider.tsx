@@ -1,6 +1,7 @@
 import { colors } from '@/theme';
 import { View, ViewProps, ViewStyle } from 'react-native';
 
+type SlantingAngle = `${number}deg`;
 interface AppDividerProps extends ViewProps {
   width?: ViewStyle['width'];
   bgColor?: ViewStyle['backgroundColor'];
@@ -9,6 +10,7 @@ interface AppDividerProps extends ViewProps {
   rounded?: boolean;
   orientation?: 'horizontal' | 'vertical';
   slanting?: 'left' | 'right';
+  slantingAngle?: SlantingAngle;
 }
 
 const AppDivider = ({
@@ -18,6 +20,7 @@ const AppDivider = ({
   rounded = false,
   orientation = 'vertical',
   slanting,
+  slantingAngle,
   style,
   ...props
 }: AppDividerProps) => {
@@ -26,7 +29,12 @@ const AppDivider = ({
       ? { width: width ?? '100%', height: height ?? 2 }
       : { width: width ?? 2, height: height ?? '100%' };
 
-  const rotation = slanting === 'right' ? '25deg' : slanting === 'left' ? '-25deg' : '0deg';
+  const rotation: SlantingAngle =
+    slanting === 'right'
+      ? (slantingAngle ?? '25deg')
+      : slanting === 'left'
+        ? (slantingAngle ?? '-25deg')
+        : '0deg';
 
   return (
     <View
