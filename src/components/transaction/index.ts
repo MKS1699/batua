@@ -1,5 +1,13 @@
 import TransactionDateTime from './TransactionDateTime';
-import TransactionRow from './TransactionRow';
+import TransactionOriginalCurrency from './TransactionOriginalCurrency';
+import TransactionPaymentMethod from './TransactionPaymentMethod';
+// import TransactionRow from './TransactionRow';
 import TransactionTypeSelection from './TransactionTypeSelection';
 
-export { TransactionDateTime, TransactionRow, TransactionTypeSelection };
+export {
+  TransactionDateTime,
+  TransactionOriginalCurrency,
+  TransactionPaymentMethod,
+  // TransactionRow,
+  TransactionTypeSelection,
+};
