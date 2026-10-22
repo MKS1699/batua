@@ -1,9 +1,9 @@
 import { colors } from '@/theme';
-import { StyleSheet, View, type ViewProps, type ViewStyle } from 'react-native';
+import { StyleProp, StyleSheet, View, type ViewProps, type ViewStyle } from 'react-native';
 
 interface AppCardProps extends ViewProps {
   backgroundColor?: string;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
 }
 
 export default function AppCard({
