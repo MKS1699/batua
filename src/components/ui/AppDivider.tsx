@@ -14,9 +14,9 @@ interface AppDividerProps extends ViewProps {
 }
 
 const AppDivider = ({
-  width = 2,
+  width,
   bgColor = colors.borderStrong,
-  height = '100%',
+  height,
   rounded = false,
   orientation = 'vertical',
   slanting,
@@ -41,8 +41,11 @@ const AppDivider = ({
       {...props}
       style={[
         orientationDimensions,
-        { backgroundColor: bgColor, borderRadius: rounded ? 999 : 0 },
-        { transform: [{ rotate: rotation }] },
+        {
+          backgroundColor: bgColor,
+          borderRadius: rounded ? 999 : 0,
+        },
+        slanting ? { transform: [{ rotate: rotation }] } : undefined,
         style,
       ]}
     />
