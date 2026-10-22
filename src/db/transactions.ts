@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 import { randomUUID } from 'expo-crypto';
 import { db } from './client';
 import { transactionsTable } from './schema';
@@ -37,8 +37,27 @@ export async function getTransactionById(id: TRANSACTION_SELECT['id']) {
   return rows[0] ?? null;
 }
 
-export async function getTransactionsByBudgetId(budgetId: TRANSACTION_SELECT['budgetId']) {
-  return await db.select().from(transactionsTable).where(eq(transactionsTable.budgetId, budgetId));
+type TransactionSortBy = 'transactionDate' | 'createdAt';
+
+export async function getTransactionsByBudgetId(
+  budgetId: TRANSACTION_SELECT['budgetId'],
+  limit?: number,
+  sortBy: TransactionSortBy = 'transactionDate'
+) {
+  if (limit !== undefined && (!Number.isInteger(limit) || limit < 1)) {
+    throw new Error('Transaction limit must be a positive integer.');
+  }
+
+  const orderColumn =
+    sortBy === 'createdAt' ? transactionsTable.createdAt : transactionsTable.transactionDate;
+
+  const query = db
+    .select()
+    .from(transactionsTable)
+    .where(eq(transactionsTable.budgetId, budgetId))
+    .orderBy(desc(orderColumn), desc(transactionsTable.createdAt));
+
+  return limit === undefined ? query : query.limit(limit);
 }
 
 // Transactions created by this user across all budgets.
