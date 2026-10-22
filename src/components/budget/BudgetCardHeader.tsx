@@ -1,6 +1,6 @@
 import { colors } from '@/theme';
 import { StyleSheet, View } from 'react-native';
-import { AppText } from '../ui';
+import { AppDivider, AppText } from '../ui';
 
 type BudgetCardHeaderProps = {
   name: string;
@@ -11,7 +11,7 @@ const BudgetCardHeader = ({ name, description }: BudgetCardHeaderProps) => {
   return (
     <View style={styles.container}>
       <AppText variant="screenHeading">{name}</AppText>
-
+      <AppDivider orientation="horizontal" height={1} rounded bgColor={colors.surfaceMint} />
       {description !== '' && (
         <AppText variant="metadataItalic" style={styles.description}>
           {description}
