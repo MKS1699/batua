@@ -1,4 +1,5 @@
 import { CreateUserInput } from '@/db/users';
+import { colors, typography } from '@/theme';
 import { Currency } from '@/types/dataTypes';
 import { randomSuperhero } from 'superheroes';
 // import {} from 'intl';
@@ -70,3 +71,7 @@ export function getGenericDate(currDate: Date): GenericDates {
 
   return GenericDates.undefined;
 }
+
+export type IconColors = keyof typeof colors;
+export type TypographyVariant = keyof typeof typography;
+export const iconSize = (variant: TypographyVariant) => typography[variant].fontSize;

@@ -6,11 +6,9 @@ import {
   MoneyIcon,
 } from 'phosphor-react-native';
 
-import { colors, typography } from '@/theme';
+import { colors } from '@/theme';
 import { PaymentMethod } from '@/types/dataTypes';
-
-type TypographyVariant = keyof typeof typography;
-type IconColors = keyof typeof colors;
+import { IconColors, iconSize, TypographyVariant } from '@/utils/utils';
 
 interface AppPaymentMethodIconProps {
   paymentMethod: PaymentMethod;
@@ -23,7 +21,7 @@ const AppPaymentMethodIcon = ({
   variant = 'body',
   color = 'borderStrong',
 }: AppPaymentMethodIconProps) => {
-  const size = typography[variant].fontSize;
+  const size = iconSize(variant);
   const resolvedColor = color ? colors[color] : undefined;
   const props = { size, ...(resolvedColor ? { color: resolvedColor } : {}) };
 
