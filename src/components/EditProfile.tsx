@@ -1,6 +1,8 @@
 import { useAppDispatch } from '@/store/hooks';
 import { getUser, UPDATE_USER_INPUT, updateUser } from '@/store/slice/userSlice';
-import { FloppyDiskIcon, XCircleIcon } from 'phosphor-react-native';
+import { validateInput } from '@/utils/validators/common';
+import { USER_NAME_MAX_LENGTH, userTextValidators } from '@/utils/validators/user';
+import { FloppyDiskIcon, WarningCircleIcon, XCircleIcon } from 'phosphor-react-native';
 import { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { AppButton, AppCard, AppInput } from './ui';
@@ -10,11 +12,11 @@ interface EditProfileProps {
   onCancel: () => void;
 }
 
-type ProfileErrors = {
-  name?: string;
-  email?: string;
-  phone?: string;
-};
+enum EditProfileTouchableFieldsEnum {
+  name = 'name',
+  email = 'email',
+  phone = 'phone',
+}
 
 const EditProfile = ({ user, onCancel }: EditProfileProps) => {
   const dispatch = useAppDispatch();
@@ -25,37 +27,32 @@ const EditProfile = ({ user, onCancel }: EditProfileProps) => {
     (user.name !== editUserState.name ||
       user.email !== editUserState.email ||
       user.phone !== editUserState.phone);
-  const [errors, setErrors] = useState<ProfileErrors>({});
+
+  const [touchedFields, setTouchedFields] = useState<
+    Partial<Record<EditProfileTouchableFieldsEnum, boolean>>
+  >({});
+
+  const hasValidationErrors =
+    !editUserState ||
+    Object.values(EditProfileTouchableFieldsEnum).some((field) => {
+      const value = editUserState[field]?.trim() ?? '';
+      const validators = userTextValidators[field] ?? [];
+
+      return validateInput(value, validators) !== null;
+    });
+
+  function handleInputBlur(touchableField: EditProfileTouchableFieldsEnum) {
+    setTouchedFields((prev) => ({
+      ...prev,
+      [touchableField]: true,
+    }));
+  }
 
   useEffect(() => {
     if (!user) return;
 
     setEditUserState((current) => current ?? user);
   }, [user]);
-
-  function validateProfile(): ProfileErrors {
-    const errors: ProfileErrors = {};
-
-    const name = editUserState?.name?.trim() ?? '';
-    const email = editUserState?.email?.trim() ?? '';
-    const phone = editUserState?.phone?.trim() ?? '';
-
-    if (!name) {
-      errors.name = 'Name cannot be empty.';
-    }
-
-    if (!email) {
-      errors.email = 'Email cannot be empty.';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      errors.email = 'Enter a valid email address.';
-    }
-
-    if (!phone) {
-      errors.phone = 'Phone cannot be empty.';
-    }
-
-    return errors;
-  }
 
   function handleUserNameChange(newName: string) {
     const prevUser = editUserState;
@@ -64,11 +61,6 @@ const EditProfile = ({ user, onCancel }: EditProfileProps) => {
       ...prevUser,
       name: newName,
     });
-
-    setErrors((prev) => ({
-      ...prev,
-      name: undefined,
-    }));
   }
 
   function handleUserPhoneChange(newPhone: string) {
@@ -78,11 +70,6 @@ const EditProfile = ({ user, onCancel }: EditProfileProps) => {
       ...prevUser,
       phone: newPhone,
     });
-
-    setErrors((prev) => ({
-      ...prev,
-      phone: undefined,
-    }));
   }
 
   function handleUserEmailChange(newEmail: string) {
@@ -92,21 +79,34 @@ const EditProfile = ({ user, onCancel }: EditProfileProps) => {
       ...prevUser,
       email: newEmail,
     });
-
-    setErrors((prev) => ({
-      ...prev,
-      email: undefined,
-    }));
   }
 
   const [isSaving, setIsSaving] = useState(false);
 
   async function handleSave() {
-    const validationErrors = validateProfile();
-    setErrors(validationErrors);
-
-    if (Object.keys(validationErrors).length > 0) return;
     if (!editUserState || !user || !hasUserEdited) return;
+
+    const fieldsToValidate = [
+      EditProfileTouchableFieldsEnum.name,
+      EditProfileTouchableFieldsEnum.email,
+      EditProfileTouchableFieldsEnum.phone,
+    ];
+
+    setTouchedFields((prev) => ({
+      ...prev,
+      name: true,
+      email: true,
+      phone: true,
+    }));
+
+    const hasErrors = fieldsToValidate.some((field) => {
+      const value = editUserState[field]?.trim() ?? '';
+      const validators = userTextValidators[field] ?? [];
+
+      return validateInput(value, validators) !== null;
+    });
+
+    if (hasErrors) return;
 
     setIsSaving(true);
 
@@ -123,14 +123,22 @@ const EditProfile = ({ user, onCancel }: EditProfileProps) => {
       ).unwrap();
 
       setEditUserState(updatedUser);
-      setErrors({});
-      onCancel(); // Close the sheet after a successful save
+      setTouchedFields({});
+      onCancel();
     } catch (error) {
       console.error('Failed to update profile:', error);
-      // Keep the sheet open so the user can retry.
     } finally {
       setIsSaving(false);
     }
+  }
+
+  function getFieldError(field: EditProfileTouchableFieldsEnum) {
+    if (!touchedFields[field]) return undefined;
+
+    const value = editUserState?.[field]?.trim() ?? '';
+    const validators = userTextValidators[field] ?? [];
+
+    return validateInput(value, validators) ?? undefined;
   }
 
   return (
@@ -146,10 +154,16 @@ const EditProfile = ({ user, onCancel }: EditProfileProps) => {
         />
         <AppButton
           label={isSaving ? 'Saving...' : 'Save'}
-          variant="primary"
-          icon={<FloppyDiskIcon />}
+          variant={hasValidationErrors ? 'danger' : 'primary'}
+          icon={
+            !hasUserEdited || hasValidationErrors || isSaving ? (
+              <WarningCircleIcon />
+            ) : (
+              <FloppyDiskIcon />
+            )
+          }
           iconPosition="left"
-          disabled={!hasUserEdited || isSaving}
+          disabled={!hasUserEdited || hasValidationErrors || isSaving}
           onPress={handleSave}
         />
       </View>
@@ -159,25 +173,29 @@ const EditProfile = ({ user, onCancel }: EditProfileProps) => {
           label="Name"
           placeholder={editUserState?.name ?? 'Enter your name'}
           value={editUserState?.name}
+          onBlur={() => handleInputBlur(EditProfileTouchableFieldsEnum.name)}
           onChangeText={handleUserNameChange}
           keyboardType="default"
-          error={errors?.name}
+          error={getFieldError(EditProfileTouchableFieldsEnum.name)}
+          maxLength={USER_NAME_MAX_LENGTH}
         />
         <AppInput
           label="Email"
           placeholder={editUserState?.email ?? 'Enter your email'}
           value={editUserState?.email}
           onChangeText={handleUserEmailChange}
+          onBlur={() => handleInputBlur(EditProfileTouchableFieldsEnum.email)}
           keyboardType="email-address"
-          error={errors?.email}
+          error={getFieldError(EditProfileTouchableFieldsEnum.email)}
         />
         <AppInput
           label="Phone"
           placeholder={editUserState?.phone ?? 'Enter your phone'}
           value={editUserState?.phone}
           onChangeText={handleUserPhoneChange}
+          onBlur={() => handleInputBlur(EditProfileTouchableFieldsEnum.phone)}
           keyboardType="phone-pad"
-          error={errors?.phone}
+          error={getFieldError(EditProfileTouchableFieldsEnum.phone)}
         />
       </View>
     </AppCard>
