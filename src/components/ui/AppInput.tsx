@@ -1,5 +1,5 @@
 import { colors, fonts } from '@/theme';
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { StyleSheet, TextInput, View, type TextInputProps, type ViewStyle } from 'react-native';
 import AppText from './AppText';
 
@@ -11,7 +11,18 @@ interface AppInputProps extends TextInputProps {
   containerStyle?: ViewStyle;
   icon?: ReactNode;
   iconPosition?: InputIconPosition;
+
+  autoGrow?: boolean;
+  minAutoGrowHeight?: number;
+  maxAutoGrowHeight?: number;
 }
+
+// TODO: Verify multiline newline preservation across the transaction flow.
+// 1. Confirm line breaks (e.g. "A\nB") are preserved when saving to SQLite.
+// 2. Ensure newline characters remain intact when loading transaction data.
+// 3. Verify descriptions display on separate lines in transaction details
+//    and any other relevant UI.
+// 4. Add or adjust storage and display handling if line breaks are lost.
 
 export default function AppInput({
   label,
@@ -20,33 +31,62 @@ export default function AppInput({
   style,
   icon,
   iconPosition = 'start',
+  maxLength,
+  autoGrow = false,
+  minAutoGrowHeight = 48,
+  maxAutoGrowHeight = 120,
+  onContentSizeChange,
+  multiline,
+  scrollEnabled,
   ...props
 }: AppInputProps) {
   const isLabelIcon = iconPosition === 'beforeLabel' || iconPosition === 'afterLabel';
+  const characterCount = String(props.value ?? '').length;
+  const [contentHeight, setContentHeight] = useState(minAutoGrowHeight);
+  const inputHeight = Math.min(Math.max(contentHeight, minAutoGrowHeight), maxAutoGrowHeight);
+  const isAtMaxHeight = contentHeight >= maxAutoGrowHeight;
 
   return (
     <View style={containerStyle}>
-      {isLabelIcon ? (
-        <View style={styles.labelRow}>
-          {iconPosition === 'beforeLabel' && icon}
+      <View style={styles.labelRow}>
+        {isLabelIcon ? (
+          <View style={styles.labelIconRow}>
+            {iconPosition === 'beforeLabel' && icon}
 
+            <AppText variant="bodyImportant" style={styles.label}>
+              {label}
+            </AppText>
+
+            {iconPosition === 'afterLabel' && icon}
+          </View>
+        ) : (
           <AppText variant="bodyImportant" style={styles.label}>
             {label}
           </AppText>
+        )}
 
-          {iconPosition === 'afterLabel' && icon}
-        </View>
-      ) : (
-        <AppText variant="bodyImportant" style={styles.label}>
-          {label}
-        </AppText>
-      )}
+        {maxLength !== undefined && (
+          <AppText variant="metadataItalic">
+            {characterCount}/{maxLength}
+          </AppText>
+        )}
+      </View>
 
       <View style={[styles.inputContainer, error ? styles.inputError : undefined]}>
         {iconPosition === 'start' && icon}
 
         <TextInput
           {...props}
+          maxLength={maxLength}
+          multiline={autoGrow ? true : multiline}
+          scrollEnabled={autoGrow ? isAtMaxHeight : scrollEnabled}
+          onContentSizeChange={(event) => {
+            onContentSizeChange?.(event);
+
+            if (!autoGrow) return;
+
+            setContentHeight(event.nativeEvent.contentSize.height);
+          }}
           accessibilityLabel={label || props.placeholder}
           placeholderTextColor={colors.textSecondary}
           selectionColor={colors.textPrimary}
@@ -54,6 +94,10 @@ export default function AppInput({
             styles.input,
             iconPosition === 'start' && styles.inputWithStartIcon,
             iconPosition === 'end' && styles.inputWithEndIcon,
+            autoGrow && {
+              height: inputHeight,
+              textAlignVertical: 'top',
+            },
             style,
           ]}
         />
@@ -62,7 +106,7 @@ export default function AppInput({
       </View>
 
       {error ? (
-        <AppText variant="metadata" accessibilityRole="alert" style={styles.error}>
+        <AppText variant="metadataItalic" accessibilityRole="alert" style={styles.error}>
           {error}
         </AppText>
       ) : null}
@@ -71,14 +115,18 @@ export default function AppInput({
 }
 
 const styles = StyleSheet.create({
-  label: {
-    marginBottom: 8,
-  },
+  label: {},
   labelRow: {
+    marginTop: 10,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    marginBottom: 8,
+    justifyContent: 'space-between',
+  },
+  labelIconRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   inputContainer: {
     minHeight: 48,

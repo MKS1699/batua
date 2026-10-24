@@ -251,9 +251,7 @@ const CreateTransaction = () => {
     };
 
     try {
-      const createdTransaction = await dispatch(addNewTransaction(transactionPayload)).unwrap();
-
-      // objectLogger('From DB Transaction Created:', createdTransaction);
+      await dispatch(addNewTransaction(transactionPayload)).unwrap();
 
       // resetting state
       setTransaction(null);
@@ -303,6 +301,8 @@ const CreateTransaction = () => {
                 : undefined
             }
             maxLength={TRANSACTION_TITLE_MAX_LENGTH}
+            autoGrow
+            maxAutoGrowHeight={60}
           />
           <AppInput
             label="Description"
@@ -320,6 +320,7 @@ const CreateTransaction = () => {
                 : undefined
             }
             maxLength={TRANSACTION_DESCRIPTION_MAX_LENGTH}
+            autoGrow
           />
           <AppInput
             label="Amount"
@@ -340,9 +341,6 @@ const CreateTransaction = () => {
             }
           />
         </View>
-        {/* <ScrollView style={{ marginVertical: 50 }}>
-          <AppText>{JSON.stringify(transaction, null, 2)}</AppText>
-        </ScrollView> */}
         {/* editable fields */}
         <View style={styles.curPayDate}>
           {transaction?.transactionDate && (
