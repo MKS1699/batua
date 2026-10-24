@@ -53,3 +53,10 @@ export function validateInput<T>(value: T, validators: InputValidator<T>[]): str
 
   return null;
 }
+
+export const emailValidator: InputValidator<string> = (value) => {
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) {
+    return 'Invalid Email address.';
+  }
+  return null;
+};
