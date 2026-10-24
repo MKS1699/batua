@@ -17,6 +17,8 @@ import { validateInput } from '@/utils/validators/common';
 import {
   originalCurrencyValidators,
   paymentMethodValidators,
+  TRANSACTION_DESCRIPTION_MAX_LENGTH,
+  TRANSACTION_TITLE_MAX_LENGTH,
   transactionTextValidators,
   transactionTypeValidators,
 } from '@/utils/validators/transaction';
@@ -300,7 +302,7 @@ const CreateTransaction = () => {
                   undefined)
                 : undefined
             }
-            maxLength={50}
+            maxLength={TRANSACTION_TITLE_MAX_LENGTH}
           />
           <AppInput
             label="Description"
@@ -317,7 +319,7 @@ const CreateTransaction = () => {
                   ) ?? undefined)
                 : undefined
             }
-            maxLength={100}
+            maxLength={TRANSACTION_DESCRIPTION_MAX_LENGTH}
           />
           <AppInput
             label="Amount"

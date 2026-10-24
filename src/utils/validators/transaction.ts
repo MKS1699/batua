@@ -9,6 +9,9 @@ import {
   requiredText,
 } from './common';
 
+export const TRANSACTION_TITLE_MAX_LENGTH: number = 50;
+export const TRANSACTION_DESCRIPTION_MAX_LENGTH: number = 100;
+
 export const validateTransactionType: InputValidator<TRANSACTION_SELECT['transactionType']> = (
   type
 ) => {
@@ -47,8 +50,8 @@ export const transactionTextValidators: Partial<
   budgetId: [requiredText],
   createdBy: [requiredText],
   id: [requiredText],
-  title: [requiredText, maxLength(50)],
-  description: [maxLength(100)],
+  title: [requiredText, maxLength(TRANSACTION_TITLE_MAX_LENGTH)],
+  description: [maxLength(TRANSACTION_DESCRIPTION_MAX_LENGTH)],
   amount: [requiredText, positiveAmount],
   transactionDate: [isValidDate, noFutureDate],
   createdAt: [isValidDate],
