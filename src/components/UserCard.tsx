@@ -23,7 +23,9 @@ const UserCard = ({ user }: UserCardProps) => {
           <View style={styles.iconBox}>
             <UserIcon weight="thin" size={20} />
           </View>
-          <AppText variant="remainingAmount">{user?.name}</AppText>
+          <AppText variant="screenHeading" numberOfLines={1}>
+            {user?.name}
+          </AppText>
         </View>
 
         <View style={styles.infoRow}>
