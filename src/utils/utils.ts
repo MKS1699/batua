@@ -1,16 +1,27 @@
 import { CreateUserInput } from '@/db/users';
 import { colors, typography } from '@/theme';
 import { Currency } from '@/types/dataTypes';
+import { USER_NAME_MAX_LENGTH } from '@/utils/validators/user';
 import { randomSuperhero } from 'superheroes';
-// import {} from 'intl';
 
 export const isoToLocale = (date: string) => {
   return new Date(date).toLocaleString();
 };
-
 export const randomUser = (): CreateUserInput => {
-  const name = randomSuperhero();
-  const emailName = name.toLowerCase().replace(/\s+/g, '').trim().toString();
+  let name = randomSuperhero();
+  let attempts = 1;
+
+  while (name.length > USER_NAME_MAX_LENGTH && attempts < 10) {
+    name = randomSuperhero();
+    attempts++;
+  }
+
+  if (name.length > USER_NAME_MAX_LENGTH) {
+    name = 'Superhero User';
+  }
+
+  const emailName = name.toLowerCase().replace(/\s+/g, '').trim();
+
   return {
     email: `${emailName}@batua.com`,
     name,
