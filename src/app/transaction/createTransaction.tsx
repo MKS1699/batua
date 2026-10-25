@@ -166,6 +166,12 @@ const CreateTransaction = () => {
     handleErrorCards('Transaction Date', error ? [error] : []);
   }
 
+  function clearTransactionDate() {
+    setTransaction((prev) =>
+      prev ? { ...prev, transactionDate: new Date().toISOString() } : prev
+    );
+  }
+
   function handleCurrency(currency: CreateTransactionInput['originalCurrency']) {
     setTransaction((prev) => (prev ? { ...prev, originalCurrency: currency } : prev));
 
@@ -343,17 +349,17 @@ const CreateTransaction = () => {
           />
         </View>
         {/* editable fields */}
-        <View style={styles.curPayDate}>
+        <View style={styles.datePickerContainer}>
           {transaction?.transactionDate && (
-            <View style={styles.datePickerContainer}>
-              <AppDateTimePicker
-                date={transaction.transactionDate}
-                dateHandler={handleTransactionDate}
-                maxDateLimit={new Date()}
-              />
-            </View>
+            <AppDateTimePicker
+              date={transaction.transactionDate}
+              dateHandler={handleTransactionDate}
+              maxDateLimit={new Date()}
+              clearDateHandler={clearTransactionDate}
+            />
           )}
-
+        </View>
+        <View style={styles.curPayDate}>
           {transaction?.originalCurrency && (
             <AppCurrencySelection
               currency={transaction.originalCurrency}
@@ -427,7 +433,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   datePickerContainer: {
-    flex: 1,
     minWidth: 0,
   },
 });

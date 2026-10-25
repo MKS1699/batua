@@ -1,10 +1,11 @@
 import { colors } from '@/theme';
 import { GenericDates, getGenericDate } from '@/utils/utils';
 import DateTimePicker from '@expo/ui/community/datetime-picker';
-import { CalendarDotIcon } from 'phosphor-react-native';
+import { CalendarPlusIcon, CalendarXIcon } from 'phosphor-react-native';
 import { useState } from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 import AppCard from './AppCard';
+import AppDivider from './AppDivider';
 import AppText from './AppText';
 
 interface AppDateTimePickerProps {
@@ -12,6 +13,7 @@ interface AppDateTimePickerProps {
   dateHandler?: (date: Date) => void;
   maxDateLimit?: Date;
   minDateLimit?: Date;
+  clearDateHandler?: () => void;
 }
 
 const AppDateTimePicker = ({
@@ -19,6 +21,7 @@ const AppDateTimePicker = ({
   dateHandler,
   maxDateLimit,
   minDateLimit,
+  clearDateHandler,
 }: AppDateTimePickerProps) => {
   const parsedDate = date ? new Date(date) : null;
 
@@ -137,16 +140,53 @@ const AppDateTimePicker = ({
     closePicker();
   }
 
+  function clearDate() {
+    if (clearDateHandler) {
+      // self value reset
+      setCurrDate(initialDate);
+      setEditDate(false);
+      setPickerMode('date');
+      // parent clear handler
+      clearDateHandler();
+    }
+    return;
+  }
+
   return (
     <>
-      <Pressable onPress={handleOpenPicker}>
-        <AppCard style={styles.container}>
-          <AppText variant="body" style={{ flex: 1 }}>
-            {dateToDisplay}
-          </AppText>
-          <CalendarDotIcon size={22} />
-        </AppCard>
-      </Pressable>
+      {/* <AppCard style={styles.container}>
+        <AppText variant="body" style={{ flex: 1 }}>
+          {dateToDisplay}
+        </AppText>
+        <Pressable onPress={handleOpenPicker}>
+          <CalendarPlusIcon size={22} />
+        </Pressable>
+        {clearDateHandler && currDate && (
+          <Pressable onPress={clearDate} style={{}}>
+            <AppDivider orientation="vertical" rounded />
+            <CalendarXIcon size={22} />
+          </Pressable>
+        )}
+      </AppCard> */}
+
+      <AppCard style={styles.container}>
+        <AppText variant="body" style={styles.dateText}>
+          {dateToDisplay}
+        </AppText>
+
+        <Pressable onPress={handleOpenPicker} style={styles.iconButton} hitSlop={4}>
+          <CalendarPlusIcon size={22} />
+        </Pressable>
+
+        {clearDateHandler && hasValidDate && (
+          <>
+            <AppDivider orientation="vertical" rounded />
+            <Pressable onPress={clearDate} style={styles.iconButton} hitSlop={4}>
+              <CalendarXIcon size={22} />
+            </Pressable>
+          </>
+        )}
+      </AppCard>
 
       {editDate && dateHandler && (
         <>
@@ -180,13 +220,32 @@ const AppDateTimePicker = ({
 };
 
 const styles = StyleSheet.create({
+  // container: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   alignSelf: 'auto',
+  //   flexShrink: 1,
+  //   gap: 10,
+  //   padding: 10,
+  // },
   container: {
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'auto',
     flexShrink: 1,
-    gap: 10,
+    gap: 8,
     padding: 10,
+  },
+  dateText: {
+    flex: 1,
+    flexShrink: 1,
+  },
+  iconButton: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
   },
   dateDisplay: {
     fontSize: 14,
