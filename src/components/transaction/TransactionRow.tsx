@@ -2,7 +2,7 @@ import AppText from '@/components/ui/AppText';
 import type { TRANSACTION_SELECT } from '@/db/transactions';
 import { colors } from '@/theme';
 import { PaymentMethodDefined } from '@/types/dataTypes';
-import { iconSize, isoToLocale, moneyFormatter } from '@/utils/utils';
+import { iconSize, isoToLocaleDate, isoToLocaleFull, moneyFormatter } from '@/utils/utils';
 import { CalendarCheckIcon } from 'phosphor-react-native';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { AppCard, AppCurrencyIcon, AppPaymentMethodIcon } from '../ui';
@@ -10,9 +10,14 @@ import { AppCard, AppCurrencyIcon, AppPaymentMethodIcon } from '../ui';
 type TransactionRowProps = {
   transaction: TRANSACTION_SELECT;
   onPress?: (transaction: TRANSACTION_SELECT) => void;
+  transactionDateStyle?: 'date' | 'date-time';
 };
 
-const TransactionRow = ({ transaction, onPress }: TransactionRowProps) => {
+const TransactionRow = ({
+  transaction,
+  onPress,
+  transactionDateStyle = 'date-time',
+}: TransactionRowProps) => {
   const isIncome = transaction.transactionType === 'income';
   const amount = Number(transaction.amount);
 
@@ -29,7 +34,9 @@ const TransactionRow = ({ transaction, onPress }: TransactionRowProps) => {
           <View style={styles.transactionDate}>
             <CalendarCheckIcon size={iconSize('metadata')} />
             <AppText style={styles.metadata} numberOfLines={1} variant="metadataItalic">
-              {isoToLocale(transaction.transactionDate)}
+              {transactionDateStyle === 'date-time'
+                ? isoToLocaleFull(transaction.transactionDate)
+                : isoToLocaleDate(transaction.transactionDate)}
             </AppText>
           </View>
         </View>

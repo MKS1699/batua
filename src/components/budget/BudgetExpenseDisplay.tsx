@@ -11,8 +11,9 @@ const BudgetExpenseDisplay = ({ style, transactions }: BudgetExpenseDisplayProps
     <View style={[style, { gap: 10 }]}>
       {transactions.map((transaction) => (
         <TransactionRow
-          transaction={transaction}
           key={`Transaction-${transaction.id}-budget-${transaction.budgetId}`}
+          transaction={transaction}
+          transactionDateStyle="date"
         />
       ))}
     </View>

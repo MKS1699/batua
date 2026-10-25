@@ -4,9 +4,14 @@ import { Currency } from '@/types/dataTypes';
 import { USER_NAME_MAX_LENGTH } from '@/utils/validators/user';
 import { randomSuperhero } from 'superheroes';
 
-export const isoToLocale = (date: string) => {
+export const isoToLocaleFull = (date: string) => {
   return new Date(date).toLocaleString();
 };
+
+export const isoToLocaleDate = (date: string) => {
+  return new Date(date).toLocaleDateString();
+};
+
 export const randomUser = (): CreateUserInput => {
   let name = randomSuperhero();
   let attempts = 1;
