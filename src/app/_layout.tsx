@@ -31,7 +31,7 @@ export default function RootLayout() {
             {/* budget screens */}
             <Stack.Screen name="budget" />
           </Stack>
-          <StatusBar />
+          <StatusBar style="dark" animated />
         </AppBootstrap>
       </StoreProvider>
     </SafeAreaProvider>
