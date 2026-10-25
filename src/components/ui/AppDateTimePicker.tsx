@@ -4,15 +4,15 @@ import DateTimePicker from '@expo/ui/community/datetime-picker';
 import { CalendarDotIcon } from 'phosphor-react-native';
 import { useState } from 'react';
 import { Pressable, StyleSheet } from 'react-native';
-import { AppCard, AppText } from '../ui';
+import AppCard from './AppCard';
+import AppText from './AppText';
 
-interface TransactionDateTimeProps {
+interface AppDateTimePickerProps {
   date: string;
-  editMode?: boolean;
   dateHandler?: (date: Date) => void;
 }
 
-const TransactionDateTime = ({ date, editMode = false, dateHandler }: TransactionDateTimeProps) => {
+const AppDateTimePicker = ({ date, dateHandler }: AppDateTimePickerProps) => {
   const now = new Date();
   const parsedDate = new Date(date);
 
@@ -24,8 +24,6 @@ const TransactionDateTime = ({ date, editMode = false, dateHandler }: Transactio
   const [editDate, setEditDate] = useState<boolean>(false);
   const [pickerMode, setPickerMode] = useState<'date' | 'time'>('date');
   const [currDate, setCurrDate] = useState<Date>(parsedDate);
-
-  const canEdit = editMode && typeof dateHandler === 'function';
 
   if (Number.isNaN(parsedDate.getTime())) {
     return <AppText>—</AppText>;
@@ -40,7 +38,9 @@ const TransactionDateTime = ({ date, editMode = false, dateHandler }: Transactio
         }}
       >
         <AppCard style={styles.container}>
-          <AppText variant="body">{dateToDisplay}</AppText>
+          <AppText variant="body" style={{ flex: 1 }}>
+            {dateToDisplay}
+          </AppText>
           <CalendarDotIcon size={22} />
         </AppCard>
       </Pressable>
@@ -130,6 +130,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'auto',
+    flexShrink: 1,
     gap: 10,
     padding: 10,
   },
@@ -146,18 +147,6 @@ const styles = StyleSheet.create({
     height: 44,
     flexShrink: 1,
   },
-  // editIcon: {
-  //   borderTopRightRadius: 12,
-  //   borderBottomRightRadius: 12,
-  //   borderWidth: 1,
-  //   borderColor: colors.accentTeal,
-  //   padding: 2,
-  //   width: 36,
-  //   height: 44,
-  //   alignItems: 'center',
-  //   justifyContent: 'center',
-  //   backgroundColor: colors.accentBlue,
-  // },
 });
 
-export default TransactionDateTime;
+export default AppDateTimePicker;

@@ -1,11 +1,10 @@
 import { ScreenContainer, ScreenHeader } from '@/components';
 import {
-  TransactionDateTime,
   TransactionOriginalCurrency,
   TransactionPaymentMethod,
   TransactionTypeSelection,
 } from '@/components/transaction';
-import { AppButton, AppErrorCard, AppInput } from '@/components/ui';
+import { AppButton, AppDateTimePicker, AppErrorCard, AppInput } from '@/components/ui';
 import { CreateTransactionInput } from '@/db/transactions';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { getBudget } from '@/store/slice/budgetSlice';
@@ -344,22 +343,25 @@ const CreateTransaction = () => {
         {/* editable fields */}
         <View style={styles.curPayDate}>
           {transaction?.transactionDate && (
-            <TransactionDateTime
-              editMode
-              date={transaction?.transactionDate || new Date().toISOString()}
-              dateHandler={handleTransactionDate}
-            />
+            <View style={styles.datePickerContainer}>
+              <AppDateTimePicker
+                date={transaction.transactionDate}
+                dateHandler={handleTransactionDate}
+              />
+            </View>
           )}
+
           {transaction?.originalCurrency && (
             <TransactionOriginalCurrency
-              currency={transaction?.originalCurrency ?? 'INR'}
+              currency={transaction.originalCurrency}
               currencyHandler={handleCurrency}
             />
           )}
+
           {transaction?.paymentMethod && (
             <TransactionPaymentMethod
               paymentHandler={handlePayment}
-              paymentMethod={transaction?.paymentMethod}
+              paymentMethod={transaction.paymentMethod}
             />
           )}
         </View>
@@ -411,7 +413,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.statusError,
   },
   curPayDate: {
-    alignSelf: 'stretch',
     flexDirection: 'row',
     alignItems: 'stretch',
     gap: 10,
@@ -421,6 +422,10 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     maxHeight: 250,
     marginHorizontal: 10,
+  },
+  datePickerContainer: {
+    flex: 1,
+    minWidth: 0,
   },
 });
 
