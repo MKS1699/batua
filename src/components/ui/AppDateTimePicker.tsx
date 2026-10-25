@@ -10,33 +10,136 @@ import AppText from './AppText';
 interface AppDateTimePickerProps {
   date: string;
   dateHandler?: (date: Date) => void;
+  maxDateLimit?: Date;
+  minDateLimit?: Date;
 }
 
-const AppDateTimePicker = ({ date, dateHandler }: AppDateTimePickerProps) => {
-  const now = new Date();
-  const parsedDate = new Date(date);
+const AppDateTimePicker = ({
+  date,
+  dateHandler,
+  maxDateLimit,
+  minDateLimit,
+}: AppDateTimePickerProps) => {
+  const parsedDate = date ? new Date(date) : null;
 
-  const genericDate = getGenericDate(parsedDate);
+  const hasValidDate = parsedDate !== null && !Number.isNaN(parsedDate.getTime());
 
-  const dateToDisplay =
-    genericDate !== GenericDates.undefined ? genericDate : parsedDate.toLocaleDateString();
+  const initialDate = hasValidDate ? parsedDate : new Date();
 
-  const [editDate, setEditDate] = useState<boolean>(false);
+  const genericDate = hasValidDate ? getGenericDate(initialDate) : GenericDates.undefined;
+
+  const dateToDisplay = hasValidDate
+    ? genericDate !== GenericDates.undefined
+      ? genericDate
+      : initialDate.toLocaleDateString()
+    : 'Select date';
+
+  const [editDate, setEditDate] = useState(false);
   const [pickerMode, setPickerMode] = useState<'date' | 'time'>('date');
-  const [currDate, setCurrDate] = useState<Date>(parsedDate);
+  const [currDate, setCurrDate] = useState<Date>(initialDate);
 
-  if (Number.isNaN(parsedDate.getTime())) {
-    return <AppText>—</AppText>;
+  function isWithinDateLimits(value: Date) {
+    const selectedDay = new Date(value);
+    selectedDay.setHours(0, 0, 0, 0);
+
+    if (maxDateLimit) {
+      const maxDay = new Date(maxDateLimit);
+
+      if (Number.isNaN(maxDay.getTime())) return false;
+
+      maxDay.setHours(0, 0, 0, 0);
+
+      if (selectedDay.getTime() > maxDay.getTime()) return false;
+    }
+
+    if (minDateLimit) {
+      const minDay = new Date(minDateLimit);
+
+      if (Number.isNaN(minDay.getTime())) return false;
+
+      minDay.setHours(0, 0, 0, 0);
+
+      if (selectedDay.getTime() < minDay.getTime()) return false;
+    }
+
+    return true;
+  }
+
+  function closePicker() {
+    setEditDate(false);
+    setPickerMode('date');
+  }
+
+  function handleOpenPicker() {
+    const openingDate = hasValidDate && isWithinDateLimits(initialDate) ? initialDate : new Date();
+
+    setCurrDate(openingDate);
+    setPickerMode('date');
+    setEditDate(true);
+  }
+
+  function handleDateChange(changedDate?: Date) {
+    if (!changedDate) return;
+
+    const updatedDate = new Date(changedDate);
+
+    if (Number.isNaN(updatedDate.getTime())) return;
+
+    if (!isWithinDateLimits(updatedDate)) return;
+
+    const selectedDay = new Date(updatedDate);
+    const today = new Date();
+
+    selectedDay.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+
+    const isPastDate = selectedDay.getTime() < today.getTime();
+
+    if (isPastDate) {
+      // Preserve the existing behavior for past transaction dates.
+      updatedDate.setHours(12, 0, 0, 0);
+    } else {
+      // Use the current time when selecting today or a future date.
+      const currentTime = new Date();
+
+      updatedDate.setHours(
+        currentTime.getHours(),
+        currentTime.getMinutes(),
+        currentTime.getSeconds(),
+        currentTime.getMilliseconds()
+      );
+    }
+
+    setCurrDate(updatedDate);
+    setPickerMode('time');
+  }
+
+  function handleTimeChange(changedDate?: Date) {
+    if (!changedDate) return;
+
+    const newDateWithNewTime = new Date(currDate);
+
+    newDateWithNewTime.setHours(
+      changedDate.getHours(),
+      changedDate.getMinutes(),
+      changedDate.getSeconds(),
+      changedDate.getMilliseconds()
+    );
+
+    // Enforce the date-only limits before committing the selection.
+    if (!isWithinDateLimits(newDateWithNewTime)) {
+      setPickerMode('date');
+      return;
+    }
+
+    setCurrDate(newDateWithNewTime);
+    dateHandler?.(newDateWithNewTime);
+    closePicker();
   }
 
   return (
     <>
-      <Pressable
-        onPress={() => {
-          setEditDate(true);
-          setPickerMode('date');
-        }}
-      >
+      <Pressable onPress={handleOpenPicker}>
         <AppCard style={styles.container}>
           <AppText variant="body" style={{ flex: 1 }}>
             {dateToDisplay}
@@ -48,75 +151,26 @@ const AppDateTimePicker = ({ date, dateHandler }: AppDateTimePickerProps) => {
       {editDate && dateHandler && (
         <>
           {pickerMode === 'date' ? (
-            // date picker
             <DateTimePicker
-              maximumDate={now}
-              value={new Date(date)}
+              maximumDate={maxDateLimit}
+              minimumDate={minDateLimit}
+              value={currDate}
               onValueChange={(_, changedDate) => {
-                if (!changedDate) return;
-
-                // checking selected date for past date
-                const updatedDate = new Date(changedDate);
-                const selectedDay = new Date(updatedDate);
-                const today = new Date();
-
-                selectedDay.setHours(0, 0, 0, 0);
-                today.setHours(0, 0, 0, 0);
-                const isPastDate = selectedDay.getTime() < today.getTime();
-
-                //   setting time to 12 pm Noon time for past date
-                if (isPastDate) {
-                  updatedDate.setHours(12, 0, 0, 0);
-                } else {
-                  // Today's transaction: explicitly reset to current time
-                  const currentTime = new Date();
-                  updatedDate.setHours(
-                    currentTime.getHours(),
-                    currentTime.getMinutes(),
-                    currentTime.getSeconds(),
-                    currentTime.getMilliseconds()
-                  );
-                }
-                setCurrDate(updatedDate);
-                setPickerMode('time');
+                handleDateChange(changedDate);
               }}
               mode="date"
-              onDismiss={() => {
-                setEditDate(false);
-                setPickerMode('date');
-              }}
+              onDismiss={closePicker}
               positiveButton={{ label: 'Time' }}
             />
           ) : (
-            // time picker
             <DateTimePicker
-              maximumDate={now}
               value={currDate}
               onValueChange={(_, changedDate) => {
-                if (changedDate) {
-                  const newDateWithNewTime = new Date(currDate);
-
-                  newDateWithNewTime.setHours(
-                    changedDate.getHours(),
-                    changedDate.getMinutes(),
-                    changedDate.getSeconds(),
-                    changedDate.getMilliseconds()
-                  );
-
-                  setCurrDate(newDateWithNewTime);
-                  setPickerMode('date');
-                  dateHandler(newDateWithNewTime);
-                  setEditDate(false);
-                }
+                handleTimeChange(changedDate);
               }}
               mode="time"
-              onDismiss={() => {
-                setEditDate(false);
-                setPickerMode('date');
-              }}
-              positiveButton={{
-                label: 'Select',
-              }}
+              onDismiss={closePicker}
+              positiveButton={{ label: 'Select' }}
             />
           )}
         </>

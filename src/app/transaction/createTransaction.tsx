@@ -34,7 +34,7 @@ enum InputTypesEnum {
   amount = 'amount',
 }
 
-type ErrorCardDetailProps = { title: string; messages: string[] }[];
+export type ErrorCardDetailProps = { title: string; messages: string[] }[];
 
 const CreateTransaction = () => {
   const router = useRouter();
@@ -349,6 +349,7 @@ const CreateTransaction = () => {
               <AppDateTimePicker
                 date={transaction.transactionDate}
                 dateHandler={handleTransactionDate}
+                maxDateLimit={new Date()}
               />
             </View>
           )}
