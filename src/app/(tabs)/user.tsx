@@ -3,21 +3,24 @@ import { AppBottomSheet, AppButton } from '@/components/ui';
 import { useAppSelector } from '@/store/hooks';
 import { getUser } from '@/store/slice/userSlice';
 import { BottomSheetMethods } from '@expo/ui/community/bottom-sheet';
+import { useFocusEffect } from 'expo-router';
 import { PencilSimpleIcon } from 'phosphor-react-native';
-import { useEffect, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { Keyboard, StyleSheet } from 'react-native';
 
 const User = () => {
   const user = useAppSelector(getUser);
   const editProfileRef = useRef<BottomSheetMethods | null>(null);
 
-  useEffect(() => {
-    const keyboardSubscription = Keyboard.addListener('keyboardDidShow', () => {
-      editProfileRef.current?.snapToIndex(1);
-    });
+  useFocusEffect(
+    useCallback(() => {
+      const keyboardSubscription = Keyboard.addListener('keyboardDidShow', () => {
+        editProfileRef.current?.snapToIndex(1);
+      });
 
-    return () => keyboardSubscription.remove();
-  }, []);
+      return () => keyboardSubscription.remove();
+    }, [])
+  );
 
   return (
     <ScreenContainer style={styles.container}>
