@@ -4,8 +4,12 @@ import { BottomSheetMethods } from '@expo/ui/community/bottom-sheet';
 import { CaretUpDownIcon } from 'phosphor-react-native';
 import { useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import { AppBottomSheet, AppCard, AppCurrencyIcon, AppDivider, AppText } from '../ui';
 import AppSearchBar from '../ui/AppSearchBar';
+import AppBottomSheet from './AppBottomSheet';
+import AppCard from './AppCard';
+import AppCurrencyIcon from './AppCurrencyIcon';
+import AppDivider from './AppDivider';
+import AppText from './AppText';
 
 interface AppCurrencySelectionProps {
   currency: Currency;
