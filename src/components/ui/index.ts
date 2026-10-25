@@ -2,6 +2,7 @@ import AppBottomSheet from './AppBottomSheet';
 import AppButton from './AppButton';
 import AppCard from './AppCard';
 import AppCurrencyIcon from './AppCurrencyIcon';
+import AppCurrencySelection from './AppCurrencySelection';
 import AppDateTimePicker from './AppDateTimePicker';
 import AppDivider from './AppDivider';
 import AppErrorCard from './AppErrorCard';
@@ -14,6 +15,7 @@ export {
   AppButton,
   AppCard,
   AppCurrencyIcon,
+  AppCurrencySelection,
   AppDateTimePicker,
   AppDivider,
   AppErrorCard,

@@ -7,15 +7,12 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { AppBottomSheet, AppCard, AppCurrencyIcon, AppDivider, AppText } from '../ui';
 import AppSearchBar from '../ui/AppSearchBar';
 
-interface TransactionOriginalCurrencyProps {
+interface AppCurrencySelectionProps {
   currency: Currency;
   currencyHandler: (newCurr: Currency) => void;
 }
 
-const TransactionOriginalCurrency = ({
-  currency,
-  currencyHandler,
-}: TransactionOriginalCurrencyProps) => {
+const AppCurrencySelection = ({ currency, currencyHandler }: AppCurrencySelectionProps) => {
   const currenciesSheetRef = useRef<BottomSheetMethods | null>(null);
   const [query, setQuery] = useState<string>('');
 
@@ -183,4 +180,4 @@ const styles = StyleSheet.create({
   currencySelectCardItem: { flexDirection: 'row', gap: 10, alignItems: 'center', paddingRight: 10 },
 });
 
-export default TransactionOriginalCurrency;
+export default AppCurrencySelection;

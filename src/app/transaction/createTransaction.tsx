@@ -1,10 +1,12 @@
 import { ScreenContainer, ScreenHeader } from '@/components';
+import { TransactionPaymentMethod, TransactionTypeSelection } from '@/components/transaction';
 import {
-  TransactionOriginalCurrency,
-  TransactionPaymentMethod,
-  TransactionTypeSelection,
-} from '@/components/transaction';
-import { AppButton, AppDateTimePicker, AppErrorCard, AppInput } from '@/components/ui';
+  AppButton,
+  AppCurrencySelection,
+  AppDateTimePicker,
+  AppErrorCard,
+  AppInput,
+} from '@/components/ui';
 import { CreateTransactionInput } from '@/db/transactions';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { getBudget } from '@/store/slice/budgetSlice';
@@ -352,7 +354,7 @@ const CreateTransaction = () => {
           )}
 
           {transaction?.originalCurrency && (
-            <TransactionOriginalCurrency
+            <AppCurrencySelection
               currency={transaction.originalCurrency}
               currencyHandler={handleCurrency}
             />
