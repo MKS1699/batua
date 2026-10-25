@@ -28,6 +28,8 @@ export default function RootLayout() {
             <Stack.Screen name="(tabs)" />
             {/* transaction screens */}
             <Stack.Screen name="transaction" />
+            {/* budget screens */}
+            <Stack.Screen name="budget" />
           </Stack>
           <StatusBar />
         </AppBootstrap>
