@@ -1,6 +1,7 @@
 import { TRANSACTION_INSERT, TRANSACTION_SELECT } from '@/db/transactions';
-import { CurrencyCodes, PaymentMethod, TransactionType } from '@/types/dataTypes';
+import { PaymentMethod, TransactionType } from '@/types/dataTypes';
 import {
+  currencyValidator,
   InputValidator,
   isValidDate,
   maxLength,
@@ -22,14 +23,14 @@ export const validateTransactionType: InputValidator<TRANSACTION_SELECT['transac
   return null;
 };
 
-export const validateOriginalCurrency: InputValidator<TRANSACTION_SELECT['originalCurrency']> = (
-  currency
-) => {
-  if (!CurrencyCodes.includes(currency)) {
-    return 'Invalid Currency.';
-  }
-  return null;
-};
+// export const validateOriginalCurrency: InputValidator<TRANSACTION_SELECT['originalCurrency']> = (
+//   currency
+// ) => {
+//   if (!CurrencyCodes.includes(currency)) {
+//     return 'Invalid Currency.';
+//   }
+//   return null;
+// };
 
 export const validatePaymentMethod: InputValidator<TRANSACTION_SELECT['paymentMethod']> = (
   method
@@ -63,7 +64,7 @@ export const transactionTypeValidators: InputValidator<TRANSACTION_SELECT['trans
 ];
 
 export const originalCurrencyValidators: InputValidator<TRANSACTION_SELECT['originalCurrency']>[] =
-  [validateOriginalCurrency];
+  [currencyValidator];
 
 export const paymentMethodValidators: InputValidator<TRANSACTION_SELECT['paymentMethod']>[] = [
   validatePaymentMethod,

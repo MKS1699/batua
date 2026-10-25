@@ -1,3 +1,7 @@
+import { BUDGET_SELECT } from '@/db/budgets';
+import { TRANSACTION_SELECT } from '@/db/transactions';
+import { CurrencyCodes } from '@/types/dataTypes';
+
 export type InputValidator<T> = (value: T) => string | null;
 
 export const requiredText: InputValidator<string> = (value) =>
@@ -57,6 +61,22 @@ export function validateInput<T>(value: T, validators: InputValidator<T>[]): str
 export const emailValidator: InputValidator<string> = (value) => {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) {
     return 'Invalid Email address.';
+  }
+  return null;
+};
+
+export const currencyValidator: InputValidator<
+  TRANSACTION_SELECT['originalCurrency'] | BUDGET_SELECT['currency']
+> = (currency) => {
+  if (!CurrencyCodes.includes(currency)) {
+    return 'Invalid Currency.';
+  }
+  return null;
+};
+
+export const boolValidator: InputValidator<boolean> = (bool) => {
+  if (typeof bool !== 'boolean') {
+    return `Invalid value. It should be of type 'boolean' i.e., 'true' or 'false'.`;
   }
   return null;
 };
