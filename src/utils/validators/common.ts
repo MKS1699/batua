@@ -18,8 +18,12 @@ export const positiveAmount: InputValidator<string> = (value) => {
 
   const amount = Number(value);
 
-  if (!Number.isFinite(amount) || amount <= 0) {
-    return 'Amount must be greater than 0 (zero).';
+  if (!Number.isFinite(amount)) {
+    return 'Enter a valid amount.';
+  }
+
+  if (amount <= 0) {
+    return 'Amount must be greater than zero.';
   }
 
   return null;
