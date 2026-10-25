@@ -31,8 +31,10 @@ const ScreenHeader = ({ title, showBack = true, onBack }: ScreenHeaderProps) => 
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: colors.background,
-        borderBottomColor: colors.borderStrong,
-        borderBottomWidth: 2,
+        borderWidth: 2,
+        borderColor: colors.borderStrong,
+        borderLeftWidth: 0,
+        borderRightWidth: 0,
       }}
     >
       {showBack && (
