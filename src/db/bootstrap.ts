@@ -1,4 +1,4 @@
-import { Currency, UserBudgetRole } from '@/types/dataTypes';
+import { UserBudgetRole } from '@/types/dataTypes';
 import {
   createNewBudgetMembership,
   getBudgetMembershipsByUserId,
@@ -31,7 +31,7 @@ export async function ensureUserBootstrapData(userId: string) {
       ownerId: userId,
       startDate: now,
       endDate: null,
-      currency: Currency.INR,
+      currency: 'INR',
       limitAmount: null,
       isShareable: false,
     });

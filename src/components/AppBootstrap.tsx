@@ -52,8 +52,24 @@ const AppBootstrap = ({ children }: AppBootstrapProps) => {
         ]);
 
         setIsReady(true);
-      } catch (error) {
-        setBootstrapError(error instanceof Error ? error.message : 'Unable to initialize Batua.');
+      } catch (error: unknown) {
+        console.error('[Batua Bootstrap] Initialization failed:', error);
+
+        if (error instanceof Error) {
+          console.error('[Batua Bootstrap] Message:', error.message);
+          console.error('[Batua Bootstrap] Stack:', error.stack);
+        } else {
+          console.error('[Batua Bootstrap] Rejected value:', JSON.stringify(error, null, 2));
+        }
+
+        const errorMessage =
+          error instanceof Error
+            ? `${error.message}\n\n${error.stack ?? ''}`
+            : typeof error === 'string'
+              ? error
+              : (JSON.stringify(error, null, 2) ?? String(error));
+
+        setBootstrapError(errorMessage);
       }
     }
 
@@ -62,8 +78,12 @@ const AppBootstrap = ({ children }: AppBootstrapProps) => {
 
   if (bootstrapError) {
     return (
-      <View>
-        <Text>Unable to initialize Batua: {bootstrapError}</Text>
+      <View style={{ flex: 1, padding: 16 }}>
+        <Text style={{ fontWeight: 'bold', marginBottom: 12 }}>Unable to initialize Batua</Text>
+
+        <Text selectable style={{ fontSize: 12 }}>
+          {bootstrapError}
+        </Text>
       </View>
     );
   }
